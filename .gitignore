@@ -1,0 +1,13 @@
+# API keys and secrets — never commit these
+Blaze/Services/BlazeConfig.swift
+Blaze Repo/Blaze/Blaze/Services/BlazeConfig.swift
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+DerivedData/
+*.xcworkspace/xcuserdata/

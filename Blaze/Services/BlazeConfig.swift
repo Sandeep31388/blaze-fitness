@@ -6,9 +6,9 @@ import Foundation
 
 enum BlazeConfig {
     // YouTube Data API v3 — get a free key at console.cloud.google.com
-    static let youtubeAPIKey = "AIzaSyCs5AHfL_4FVSNpNpXfuxH4hRG0UQIGi9s"
+    static let youtubeAPIKey = "YOUR_YOUTUBE_API_KEY"
 
     // Supabase — get from your Supabase project settings (supabase.com)
-    static let supabaseURL    = "https://tqmjbayottikfhfleumu.supabase.co"
-    static let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxbWpiYXlvdHRpa2ZoZmxldW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMTI4NTgsImV4cCI6MjA5NDY4ODg1OH0.Y5lHfq_OS5bWG1wkm8NvXfgfkeqxoa_i6899_fYRaBo"
+    static let supabaseURL    = "YOUR_SUPABASE_URL"
+    static let supabaseAnonKey = "YOUR_SUPABASE_ANON_KEY"
 }
