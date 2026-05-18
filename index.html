@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Blaze — Workout Planner</title>
+  <style>
+    /* ── Design tokens ── */
+    :root {
+      --bg:          #0D0D0D;
+      --surface:     #1A1A1A;
+      --surface2:    #222222;
+      --border:      #2A2A2A;
+      --neon:        #FF6B1A;
+      --neon-dim:    rgba(255, 107, 26, 0.15);
+      --neon-glow:   rgba(255, 107, 26, 0.35);
+      --success:     #34C759;
+      --success-dim: rgba(52, 199, 89, 0.12);
+      --warning:     #FFD60A;
+      --warning-dim: rgba(255, 214, 10, 0.08);
+      --text1:       #FFFFFF;
+      --text2:       #ABABAB;
+      --text3:       #6B6B6B;
+      --radius-sm:   8px;
+      --radius-md:   12px;
+      --radius-lg:   18px;
+      --radius-pill: 999px;
+      --font:        -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: var(--bg);
+      color: var(--text1);
+      font-family: var(--font);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px 48px;
+    }
+
+    /* ── Phone shell ── */
+    .phone {
+      width: 390px;
+      min-height: 844px;
+      background: var(--bg);
+      border-radius: 44px;
+      border: 1.5px solid #333;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px #111;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 28px 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text1);
+      height: 44px;
+    }
+    .status-bar .notch {
+      width: 126px;
+      height: 34px;
+      background: #000;
+      border-radius: var(--radius-pill);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 8px;
+    }
+    .status-icons { display: flex; gap: 6px; align-items: center; font-size: 11px; }
+
+    /* ── Screens ── */
+    .screen { display: none; flex-direction: column; min-height: 800px; }
+    .screen.active { display: flex; }
+
+    /* ── Nav bar ── */
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      padding: 8px 20px 12px;
+      min-height: 44px;
+      gap: 8px;
+    }
+    .nav-bar h1 { font-size: 17px; font-weight: 600; flex: 1; text-align: center; }
+    .nav-back {
+      background: none; border: none; color: var(--neon);
+      font-size: 15px; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; gap: 4px; padding: 0;
+    }
+    .nav-back svg { width: 10px; height: 16px; }
+    .nav-spacer { width: 60px; }
+
+    /* ── Setup screen ── */
+    .setup-content { padding: 24px 20px; flex: 1; display: flex; flex-direction: column; }
+
+    .app-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .app-logo .flame { font-size: 52px; line-height: 1; }
+    .app-logo h2 {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #FF6B1A, #FF9A3C);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-top: 4px;
+    }
+    .app-logo p { font-size: 14px; color: var(--text2); margin-top: 4px; }
+
+    .slider-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .slider-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .slider-label .icon { font-size: 18px; }
+    .slider-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--neon);
+    }
+    .slider-value span { font-size: 14px; font-weight: 500; color: var(--text2); }
+
+    input[type=range] {
+      width: 100%;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px; height: 22px;
+      background: var(--neon);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--neon-glow);
+    }
+    .slider-ticks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 18px;
+      background: var(--neon);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      margin-top: auto;
+      box-shadow: 0 4px 20px var(--neon-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.2px;
+    }
+    .generate-btn:active { opacity: 0.85; }
+
+    /* ── Loading screen ── */
+    .loading-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      gap: 28px;
+    }
+    .pulse-ring {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      border: 3px solid var(--neon);
+      animation: pulse 1.4s ease-in-out infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    @keyframes pulse {
+      0%   { transform: scale(1);   box-shadow: 0 0 0 0 var(--neon-glow); }
+      50%  { transform: scale(1.06); box-shadow: 0 0 0 14px rgba(255,107,26,0); }
+      100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(255,107,26,0); }
+    }
+    .loading-text h3 { font-size: 22px; font-weight: 700; text-align: center; }
+    .loading-text p  { font-size: 14px; color: var(--text2); text-align: center; margin-top: 8px; }
+    .loading-steps { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 280px; }
+    .loading-step {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 14px; color: var(--text2);
+    }
+    .step-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border); flex-shrink: 0;
+    }
+    .step-dot.done  { background: var(--success); }
+    .step-dot.active { background: var(--neon); animation: blink 0.8s ease-in-out infinite alternate; }
+    @keyframes blink { from { opacity: 1; } to { opacity: 0.3; } }
+    .loading-step.done  { color: var(--text1); }
+    .loading-step.active { color: var(--text1); }
+
+    /* ── Plan screen ── */
+    .plan-scroll { flex: 1; overflow-y: auto; padding: 0 0 32px; }
+
+    .progress-header {
+      padding: 16px 20px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .pie-wrap { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+    .pie-wrap svg { width: 80px; height: 80px; transform: rotate(-90deg); }
+    .pie-bg    { fill: none; stroke: var(--border); stroke-width: 8; }
+    .pie-fill  { fill: none; stroke: var(--neon); stroke-width: 8; stroke-linecap: round;
+                 stroke-dasharray: 201; stroke-dashoffset: 100; transition: stroke-dashoffset 0.6s; }
+    .pie-label {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      color: var(--neon);
+      line-height: 1.1;
+    }
+    .pie-label span { font-size: 10px; color: var(--text2); font-weight: 500; }
+
+    .plan-meta { flex: 1; }
+    .plan-meta h2 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .plan-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .stat-chip {
+      display: flex; align-items: center; gap: 4px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      font-size: 12px; color: var(--text2);
+    }
+    .stat-chip .stat-icon { font-size: 12px; }
+
+    .exit-btn {
+      background: none; border: 1px solid var(--border);
+      color: var(--text2); font-size: 13px; font-weight: 500;
+      padding: 8px 14px; border-radius: var(--radius-pill);
+      cursor: pointer; flex-shrink: 0;
+    }
+
+    .video-list { padding: 16px 16px 0; display: flex; flex-direction: column; gap: 12px; }
+
+    .video-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .video-card:active { border-color: var(--neon); }
+    .video-card.completed { opacity: 0.55; }
+
+    .thumb-wrap { position: relative; }
+    .thumb-img {
+      width: 100%; aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+    }
+    .play-badge {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .play-circle {
+      width: 44px; height: 44px;
+      background: rgba(0,0,0,0.6);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid rgba(255,255,255,0.7);
+    }
+    .play-circle svg { width: 16px; height: 16px; fill: #fff; margin-left: 2px; }
+    .done-badge {
+      position: absolute; top: 8px; right: 8px;
+      background: var(--success);
+      color: #fff; font-size: 11px; font-weight: 700;
+      padding: 3px 8px; border-radius: var(--radius-pill);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    .card-body { padding: 12px 14px 14px; }
+    .card-activity {
+      font-size: 11px; font-weight: 600; color: var(--neon);
+      text-transform: uppercase; letter-spacing: 0.6px;
+      margin-bottom: 4px;
+    }
+    .card-title { font-size: 14px; font-weight: 600; line-height: 1.3; margin-bottom: 8px; }
+    .card-channel { font-size: 12px; color: var(--text3); margin-bottom: 10px; }
+    .card-stats { display: flex; gap: 8px; }
+
+    /* ── Player screen ── */
+    .player-content { flex: 1; overflow-y: auto; padding-bottom: 40px; }
+
+    .video-frame {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      position: relative;
+    }
+    .video-frame-overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px;
+    }
+    .yt-logo {
+      font-size: 13px; font-weight: 700;
+      background: #FF0000; color: #fff;
+      padding: 5px 10px; border-radius: 6px;
+    }
+    .video-frame-overlay p { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+    .player-info { padding: 16px 20px; }
+    .player-activity {
+      font-size: 11px; font-weight: 600; color: var(--neon);
+      text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px;
+    }
+    .player-title {
+      font-size: 18px; font-weight: 700; line-height: 1.3; margin-bottom: 4px;
+    }
+    .player-channel { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
+    .player-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+
+    .protip-box {
+      display: flex; gap: 10px; align-items: flex-start;
+      background: var(--warning-dim);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 214, 10, 0.15);
+    }
+    .protip-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .protip-text h4 { font-size: 13px; font-weight: 700; color: var(--warning); margin-bottom: 4px; }
+    .protip-text p  { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+    .done-btn {
+      width: 100%;
+      padding: 17px;
+      background: var(--success);
+      color: #fff;
+      font-size: 16px; font-weight: 700;
+      border: none; border-radius: var(--radius-pill);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 12px;
+    }
+    .back-btn {
+      width: 100%;
+      padding: 14px;
+      background: none;
+      color: var(--text2);
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+
+    /* ── Completed state ── */
+    .completed-bar {
+      width: 100%;
+      padding: 17px;
+      background: var(--success-dim);
+      color: var(--success);
+      font-size: 15px; font-weight: 600;
+      border-radius: var(--radius-pill);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    /* ── Saved plans screen ── */
+    .tab-bar {
+      display: flex;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 8px 0 20px;
+    }
+    .tab-item {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 3px;
+      font-size: 10px; font-weight: 500;
+      color: var(--text3);
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .tab-item.active { color: var(--neon); }
+    .tab-icon { font-size: 20px; line-height: 1; }
+
+    /* Share banner */
+    .share-note {
+      background: var(--neon-dim);
+      border: 1px solid rgba(255,107,26,0.3);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--text2);
+      text-align: center;
+      margin: 0 16px 16px;
+    }
+    .share-note strong { color: var(--neon); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 0; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ PHONE SHELL -->
+<div class="phone" id="phone">
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="notch"></div>
+    <div class="status-icons">
+      <span>●●●</span>
+      <span>WiFi</span>
+      <span>🔋</span>
+    </div>
+  </div>
+
+  <!-- ═══════ SCREEN 1 — SETUP ═══════ -->
+  <div class="screen active" id="screen-setup">
+    <div class="setup-content">
+
+      <div class="app-logo">
+        <div class="flame">🔥</div>
+        <h2>BLAZE</h2>
+        <p>Your AI workout planner</p>
+      </div>
+
+      <div class="slider-card">
+        <div class="slider-header">
+          <div class="slider-label">
+            <span class="icon">⏱</span>
+            <span>Target time</span>
+          </div>
+          <div class="slider-value" id="minutes-val">30<span> min</span></div>
+        </div>
+        <input type="range" min="10" max="90" value="30" id="minutes-slider"
+               oninput="document.getElementById('minutes-val').innerHTML=this.value+'<span> min</span>'">
+        <div class="slider-ticks"><span>10</span><span>30</span><span>60</span><span>90</span></div>
+      </div>
+
+      <div class="slider-card">
+        <div class="slider-header">
+          <div class="slider-label">
+            <span class="icon">🔥</span>
+            <span>Target calories</span>
+          </div>
+          <div class="slider-value" id="cals-val">300<span> cal</span></div>
+        </div>
+        <input type="range" min="100" max="800" value="300" step="25" id="cals-slider"
+               oninput="document.getElementById('cals-val').innerHTML=this.value+'<span> cal</span>'">
+        <div class="slider-ticks"><span>100</span><span>300</span><span>500</span><span>800</span></div>
+      </div>
+
+      <button class="generate-btn" onclick="showScreen('screen-loading')">
+        ⚡ Generate My Workout
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ═══════ SCREEN 2 — LOADING ═══════ -->
+  <div class="screen" id="screen-loading">
+    <div class="loading-content">
+
+      <div class="pulse-ring">🔥</div>
+
+      <div class="loading-text">
+        <h3>Building your plan…</h3>
+        <p>Searching YouTube for the best<br>follow-along workouts for you.</p>
+      </div>
+
+      <div class="loading-steps">
+        <div class="loading-step done">
+          <div class="step-dot done"></div>
+          <span>Calculating activity sequence</span>
+        </div>
+        <div class="loading-step done">
+          <div class="step-dot done"></div>
+          <span>Filtering workout videos</span>
+        </div>
+        <div class="loading-step active">
+          <div class="step-dot active"></div>
+          <span>Checking embeddability…</span>
+        </div>
+        <div class="loading-step">
+          <div class="step-dot"></div>
+          <span>Assembling playlist</span>
+        </div>
+      </div>
+
+      <button class="generate-btn" style="margin-top:24px;max-width:240px" onclick="showScreen('screen-plan')">
+        ▶ View Plan (prototype)
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ═══════ SCREEN 3 — PLAN ═══════ -->
+  <div class="screen" id="screen-plan">
+
+    <div class="nav-bar">
+      <button class="nav-back" onclick="showScreen('screen-setup')">
+        <svg viewBox="0 0 10 16"><path d="M8 1L2 8l6 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        Back
+      </button>
+      <h1>My Plan</h1>
+      <div class="nav-spacer"></div>
+    </div>
+
+    <div class="plan-scroll">
+
+      <!-- Progress header -->
+      <div class="progress-header">
+        <div class="pie-wrap">
+          <svg viewBox="0 0 72 72">
+            <circle class="pie-bg" cx="36" cy="36" r="32"/>
+            <circle class="pie-fill" cx="36" cy="36" r="32" id="pie-circle"/>
+          </svg>
+          <div class="pie-label">
+            <strong id="pie-pct">1/4</strong>
+            <span>done</span>
+          </div>
+        </div>
+        <div class="plan-meta">
+          <h2>Blaze 30-min Plan</h2>
+          <div class="plan-stats">
+            <div class="stat-chip"><span class="stat-icon">⏱</span> 32 min</div>
+            <div class="stat-chip"><span class="stat-icon">🔥</span> 315 cal</div>
+            <div class="stat-chip"><span class="stat-icon">▶</span> 4 videos</div>
+          </div>
+        </div>
+        <button class="exit-btn" onclick="showScreen('screen-setup')">Exit</button>
+      </div>
+
+      <div class="share-note">
+        <strong>Prototype</strong> — tap any card to see the player screen
+      </div>
+
+      <!-- Video cards -->
+      <div class="video-list">
+
+        <!-- Card 1 — completed -->
+        <div class="video-card completed" onclick="showPlayer(0)">
+          <div class="thumb-wrap">
+            <div class="thumb-img">🧘</div>
+            <div class="play-badge"><div class="play-circle"><svg viewBox="0 0 12 14"><polygon points="1,1 11,7 1,13"/></svg></div></div>
+            <div class="done-badge">✓ Done</div>
+          </div>
+          <div class="card-body">
+            <div class="card-activity">Warm Up</div>
+            <div class="card-title">Follow Along Full Body Warm Up — No Equipment</div>
+            <div class="card-channel">FitnessBlender</div>
+            <div class="card-stats">
+              <div class="stat-chip"><span class="stat-icon">⏱</span> 5 min</div>
+              <div class="stat-chip"><span class="stat-icon">🔥</span> 30 cal</div>
+              <div class="stat-chip"><span class="stat-icon">🏃</span> Warm Up</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 — current -->
+        <div class="video-card" onclick="showPlayer(1)" style="border-color: var(--neon);">
+          <div class="thumb-wrap">
+            <div class="thumb-img">⚡</div>
+            <div class="play-badge"><div class="play-circle" style="border-color:var(--neon)"><svg viewBox="0 0 12 14"><polygon points="1,1 11,7 1,13"/></svg></div></div>
+          </div>
+          <div class="card-body">
+            <div class="card-activity">HIIT</div>
+            <div class="card-title">Follow Along HIIT Workout — Full Body Fat Burn Home</div>
+            <div class="card-channel">Heather Robertson</div>
+            <div class="card-stats">
+              <div class="stat-chip"><span class="stat-icon">⏱</span> 20 min</div>
+              <div class="stat-chip"><span class="stat-icon">🔥</span> 240 cal</div>
+              <div class="stat-chip"><span class="stat-icon">🏃</span> HIIT</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="video-card" onclick="showPlayer(2)">
+          <div class="thumb-wrap">
+            <div class="thumb-img">🦵</div>
+            <div class="play-badge"><div class="play-circle"><svg viewBox="0 0 12 14"><polygon points="1,1 11,7 1,13"/></svg></div></div>
+          </div>
+          <div class="card-body">
+            <div class="card-activity">Strength</div>
+            <div class="card-title">Follow Along Bodyweight Strength Workout — No Equipment</div>
+            <div class="card-channel">MadFit</div>
+            <div class="card-stats">
+              <div class="stat-chip"><span class="stat-icon">⏱</span> 7 min</div>
+              <div class="stat-chip"><span class="stat-icon">🔥</span> 45 cal</div>
+              <div class="stat-chip"><span class="stat-icon">🏃</span> Strength</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="video-card" onclick="showPlayer(3)">
+          <div class="thumb-wrap">
+            <div class="thumb-img">🧘</div>
+            <div class="play-badge"><div class="play-circle"><svg viewBox="0 0 12 14"><polygon points="1,1 11,7 1,13"/></svg></div></div>
+          </div>
+          <div class="card-body">
+            <div class="card-activity">Cool Down</div>
+            <div class="card-title">Follow Along Cool Down Stretch — Post Workout Recovery</div>
+            <div class="card-channel">Yoga With Adriene</div>
+            <div class="card-stats">
+              <div class="stat-chip"><span class="stat-icon">⏱</span> 5 min</div>
+              <div class="stat-chip"><span class="stat-icon">🔥</span> 20 cal</div>
+              <div class="stat-chip"><span class="stat-icon">🏃</span> Cool Down</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /video-list -->
+    </div><!-- /plan-scroll -->
+
+    <div class="tab-bar">
+      <div class="tab-item active"><span class="tab-icon">⚡</span>Plan</div>
+      <div class="tab-item" onclick="showScreen('screen-setup')"><span class="tab-icon">🔥</span>New Plan</div>
+      <div class="tab-item"><span class="tab-icon">📋</span>Saved</div>
+    </div>
+
+  </div><!-- /screen-plan -->
+
+  <!-- ═══════ SCREEN 4 — PLAYER ═══════ -->
+  <div class="screen" id="screen-player">
+
+    <div class="nav-bar">
+      <button class="nav-back" onclick="showScreen('screen-plan')">
+        <svg viewBox="0 0 10 16"><path d="M8 1L2 8l6 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        Back
+      </button>
+      <h1 id="player-nav-title">HIIT</h1>
+      <div class="nav-spacer"></div>
+    </div>
+
+    <div class="player-content">
+
+      <!-- Video frame -->
+      <div class="video-frame">
+        <div class="video-frame-overlay">
+          <div class="yt-logo">▶ YouTube</div>
+          <p>Video plays here on device</p>
+        </div>
+      </div>
+
+      <div class="player-info">
+        <div class="player-activity" id="player-activity">HIIT</div>
+        <div class="player-title" id="player-title">Follow Along HIIT Workout — Full Body Fat Burn Home</div>
+        <div class="player-channel" id="player-channel">Heather Robertson</div>
+
+        <div class="player-chips">
+          <div class="stat-chip"><span class="stat-icon">⏱</span> <span id="player-dur">20 min</span></div>
+          <div class="stat-chip"><span class="stat-icon">🔥</span> <span id="player-cal">240 cal</span></div>
+          <div class="stat-chip"><span class="stat-icon">🏃</span> <span id="player-type">HIIT</span></div>
+        </div>
+
+        <div class="protip-box">
+          <span class="protip-icon">💡</span>
+          <div class="protip-text">
+            <h4>Pro tip</h4>
+            <p id="player-tip">The 2:1 work-to-rest ratio (40s on, 20s off) maximises the after-burn effect. HIIT raises your resting metabolic rate for 24–48 hours after the session.</p>
+          </div>
+        </div>
+
+        <div id="done-area">
+          <button class="done-btn" onclick="markDone()">
+            ✓ Done — back to playlist
+          </button>
+        </div>
+
+        <button class="back-btn" onclick="showScreen('screen-plan')">
+          ← Back to playlist
+        </button>
+      </div>
+
+    </div>
+  </div><!-- /screen-player -->
+
+</div><!-- /phone -->
+
+<script>
+  const videos = [
+    {
+      activity: "Warm Up", title: "Follow Along Full Body Warm Up — No Equipment",
+      channel: "FitnessBlender", dur: "5 min", cal: "30 cal", type: "Warm Up",
+      tip: "Dynamic stretches (leg swings, arm circles) are more effective pre-workout than static holds. Drink 200–300ml of water before you start.",
+      completed: true
+    },
+    {
+      activity: "HIIT", title: "Follow Along HIIT Workout — Full Body Fat Burn Home",
+      channel: "Heather Robertson", dur: "20 min", cal: "240 cal", type: "HIIT",
+      tip: "The 2:1 work-to-rest ratio (40s on, 20s off) maximises the after-burn effect. HIIT raises your resting metabolic rate for 24–48 hours after the session.",
+      completed: false
+    },
+    {
+      activity: "Strength", title: "Follow Along Bodyweight Strength Workout — No Equipment",
+      channel: "MadFit", dur: "7 min", cal: "45 cal", type: "Strength",
+      tip: "Compound moves (squats, deadlifts, rows) burn 2× more calories than isolation exercises. A 60-second rest between sets maintains strength while maximising calorie burn.",
+      completed: false
+    },
+    {
+      activity: "Cool Down", title: "Follow Along Cool Down Stretch — Post Workout Recovery",
+      channel: "Yoga With Adriene", dur: "5 min", cal: "20 cal", type: "Cool Down",
+      tip: "Static stretching post-workout improves flexibility by 8–10% over 4 weeks. Box breathing (4 counts in, hold, out, hold) drops heart rate 20% faster than passive rest.",
+      completed: false
+    }
+  ];
+
+  let completedVideos = new Set([0]);
+  let currentVideoIndex = 1;
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    updatePie();
+  }
+
+  function showPlayer(index) {
+    currentVideoIndex = index;
+    const v = videos[index];
+    document.getElementById('player-nav-title').textContent = v.activity;
+    document.getElementById('player-activity').textContent  = v.activity;
+    document.getElementById('player-title').textContent     = v.title;
+    document.getElementById('player-channel').textContent   = v.channel;
+    document.getElementById('player-dur').textContent       = v.dur;
+    document.getElementById('player-cal').textContent       = v.cal;
+    document.getElementById('player-type').textContent      = v.type;
+    document.getElementById('player-tip').textContent       = v.tip;
+
+    const doneArea = document.getElementById('done-area');
+    if (completedVideos.has(index)) {
+      doneArea.innerHTML = '<div class="completed-bar">✓ Completed</div>';
+    } else {
+      doneArea.innerHTML = '<button class="done-btn" onclick="markDone()">✓ Done — back to playlist</button>';
+    }
+
+    showScreen('screen-player');
+  }
+
+  function markDone() {
+    completedVideos.add(currentVideoIndex);
+    updatePie();
+    showScreen('screen-plan');
+    // Grey out the completed card
+    const cards = document.querySelectorAll('.video-card');
+    cards.forEach((card, i) => {
+      card.classList.toggle('completed', completedVideos.has(i));
+      card.style.borderColor = '';
+    });
+    // Highlight next uncompleted card
+    for (let i = 0; i < videos.length; i++) {
+      if (!completedVideos.has(i)) {
+        cards[i].style.borderColor = 'var(--neon)';
+        break;
+      }
+    }
+  }
+
+  function updatePie() {
+    const pct = completedVideos.size / videos.length;
+    const circumference = 2 * Math.PI * 32; // r=32
+    const offset = circumference * (1 - pct);
+    document.getElementById('pie-circle').style.strokeDasharray  = circumference;
+    document.getElementById('pie-circle').style.strokeDashoffset = offset;
+    document.getElementById('pie-pct').textContent = completedVideos.size + '/' + videos.length;
+  }
+
+  // Init pie
+  updatePie();
+</script>
+</body>
+</html>

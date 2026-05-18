@@ -1,0 +1,268 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <clipPath id="roundedClip">
+      <rect width="1024" height="1024" rx="224" ry="224"/>
+    </clipPath>
+
+    <!-- Outer flame shape clip — used to contain the EKG line inside the flame -->
+    <clipPath id="flameClip">
+      <path d="
+        M 512,120
+        C 560,200 620,240 650,310
+        C 690,400 670,450 640,490
+        C 620,515 600,525 590,540
+        C 575,560 572,580 574,600
+        C 560,575 552,550 554,520
+        C 540,545 530,575 532,610
+        C 510,575 505,540 510,500
+        C 490,530 480,565 482,605
+        C 460,570 455,530 462,490
+        C 440,520 432,560 436,600
+        C 415,560 412,510 422,468
+        C 400,495 390,535 392,575
+        C 368,530 366,470 382,420
+        C 350,450 338,500 342,550
+        C 310,490 315,410 350,355
+        C 320,370 298,400 290,440
+        C 272,370 295,290 340,235
+        C 370,195 410,170 440,145
+        C 420,185 415,225 425,260
+        C 450,200 480,155 512,120
+        Z
+      "/>
+    </clipPath>
+
+    <!-- Strong neon orange glow -->
+    <filter id="glowOrange" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="blur1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8"  result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Soft orange glow for flame body -->
+    <filter id="glowFlameSoft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="28" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Sharp white-cyan glow for EKG line -->
+    <filter id="glowEKG" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="blur1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5"  result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="glowText" x="-20%" y="-40%" width="140%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Flame gradient: deep orange at base, bright orange-white at core tip -->
+    <linearGradient id="flameGrad" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%"   stop-color="#FF2200" stop-opacity="1"/>
+      <stop offset="40%"  stop-color="#FF6600" stop-opacity="1"/>
+      <stop offset="75%"  stop-color="#FF9500" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#FFCC00" stop-opacity="0.5"/>
+    </linearGradient>
+
+    <!-- Inner flame gradient (brighter core) -->
+    <linearGradient id="innerFlameGrad" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%"   stop-color="#FF5500" stop-opacity="0.9"/>
+      <stop offset="50%"  stop-color="#FF8C00" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#FFD000" stop-opacity="0.3"/>
+    </linearGradient>
+
+    <!-- Ambient glow behind flame -->
+    <radialGradient id="ambientGlow" cx="50%" cy="62%" r="38%">
+      <stop offset="0%"   stop-color="#FF4500" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#FF4500" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="224" ry="224" fill="#080808"/>
+
+  <!-- Ambient orange glow on background -->
+  <rect width="1024" height="1024" rx="224" ry="224"
+        fill="url(#ambientGlow)" clip-path="url(#roundedClip)"/>
+
+  <!-- ── FLAME BODY ── -->
+
+  <!-- Outer glow halo of flame (blurred, behind everything) -->
+  <path
+    d="
+      M 512,120
+      C 560,200 620,240 650,310
+      C 690,400 670,450 640,490
+      C 620,515 600,525 590,540
+      C 575,560 572,580 574,600
+      C 560,575 552,550 554,520
+      C 540,545 530,575 532,610
+      C 510,575 505,540 510,500
+      C 490,530 480,565 482,605
+      C 460,570 455,530 462,490
+      C 440,520 432,560 436,600
+      C 415,560 412,510 422,468
+      C 400,495 390,535 392,575
+      C 368,530 366,470 382,420
+      C 350,450 338,500 342,550
+      C 310,490 315,410 350,355
+      C 320,370 298,400 290,440
+      C 272,370 295,290 340,235
+      C 370,195 410,170 440,145
+      C 420,185 415,225 425,260
+      C 450,200 480,155 512,120
+      Z
+    "
+    fill="#FF4500"
+    filter="url(#glowFlameSoft)"
+    opacity="0.5"
+    clip-path="url(#roundedClip)"
+  />
+
+  <!-- Main flame fill -->
+  <path
+    d="
+      M 512,120
+      C 560,200 620,240 650,310
+      C 690,400 670,450 640,490
+      C 620,515 600,525 590,540
+      C 575,560 572,580 574,600
+      C 560,575 552,550 554,520
+      C 540,545 530,575 532,610
+      C 510,575 505,540 510,500
+      C 490,530 480,565 482,605
+      C 460,570 455,530 462,490
+      C 440,520 432,560 436,600
+      C 415,560 412,510 422,468
+      C 400,495 390,535 392,575
+      C 368,530 366,470 382,420
+      C 350,450 338,500 342,550
+      C 310,490 315,410 350,355
+      C 320,370 298,400 290,440
+      C 272,370 295,290 340,235
+      C 370,195 410,170 440,145
+      C 420,185 415,225 425,260
+      C 450,200 480,155 512,120
+      Z
+    "
+    fill="url(#flameGrad)"
+    clip-path="url(#roundedClip)"
+  />
+
+  <!-- Inner flame (brighter core) -->
+  <path
+    d="
+      M 512,200
+      C 545,260 585,290 605,345
+      C 630,410 615,450 595,480
+      C 580,500 568,512 564,530
+      C 554,510 550,488 555,465
+      C 540,488 532,515 534,545
+      C 518,515 514,488 518,460
+      C 502,485 496,515 498,548
+      C 480,515 477,478 486,445
+      C 468,468 462,502 465,535
+      C 448,500 447,458 460,420
+      C 440,442 434,478 438,512
+      C 418,470 420,418 442,375
+      C 418,390 404,425 406,462
+      C 388,415 396,355 426,310
+      C 448,278 478,258 498,238
+      C 482,265 478,292 486,316
+      C 498,272 504,232 512,200
+      Z
+    "
+    fill="url(#innerFlameGrad)"
+    clip-path="url(#roundedClip)"
+  />
+
+  <!-- ── EKG LINE INSIDE THE FLAME ── -->
+  <!-- The line runs horizontally through the mid-section of the flame -->
+  <!-- y=490 is roughly the flame's widest, most readable mid-band     -->
+
+  <!-- Wide glow pass -->
+  <g clip-path="url(#flameClip)">
+    <path
+      d="
+        M 295,490
+        L 380,490
+        L 400,474
+        L 420,490
+        L 445,490
+        L 468,340
+        L 488,620
+        L 508,490
+        L 530,490
+        L 548,445
+        L 566,490
+        L 660,490
+      "
+      fill="none"
+      stroke="#FFFFFF"
+      stroke-width="30"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      filter="url(#glowEKG)"
+      opacity="0.6"
+    />
+
+    <!-- Sharp bright core of EKG line -->
+    <path
+      d="
+        M 295,490
+        L 380,490
+        L 400,474
+        L 420,490
+        L 445,490
+        L 468,340
+        L 488,620
+        L 508,490
+        L 530,490
+        L 548,445
+        L 566,490
+        L 660,490
+      "
+      fill="none"
+      stroke="#FFFFFF"
+      stroke-width="8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- Bright white dot at spike peak (outside flameClip so it's always fully visible) -->
+  <circle cx="468" cy="340" r="16"
+          fill="#FFFFFF" filter="url(#glowEKG)" opacity="0.95"
+          clip-path="url(#roundedClip)"/>
+  <circle cx="468" cy="340" r="7"
+          fill="#FFFFFF" clip-path="url(#roundedClip)"/>
+
+  <!-- ── WORDMARK ── -->
+  <text
+    x="512" y="880"
+    font-family="'Arial Black', 'Helvetica Neue', sans-serif"
+    font-weight="900"
+    font-size="112"
+    letter-spacing="18"
+    text-anchor="middle"
+    fill="#FF6600"
+    filter="url(#glowText)"
+    clip-path="url(#roundedClip)"
+  >BLAZE</text>
+
+</svg>

@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background rounded rect clip -->
+    <clipPath id="roundedClip">
+      <rect width="1024" height="1024" rx="224" ry="224"/>
+    </clipPath>
+
+    <!-- Neon cyan glow filters -->
+    <filter id="glowStrong" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="blur1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6"  result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="glowSoft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="glowText" x="-20%" y="-40%" width="140%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Subtle radial glow behind the line -->
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="45%">
+      <stop offset="0%"   stop-color="#00FFE5" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#00FFE5" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="224" ry="224" fill="#080808"/>
+
+  <!-- Subtle dark grid lines for depth -->
+  <g clip-path="url(#roundedClip)" opacity="0.06" stroke="#00FFE5" stroke-width="1">
+    <line x1="0"    y1="256"  x2="1024" y2="256"/>
+    <line x1="0"    y1="512"  x2="1024" y2="512"/>
+    <line x1="0"    y1="768"  x2="1024" y2="768"/>
+    <line x1="256"  y1="0"    x2="256"  y2="1024"/>
+    <line x1="512"  y1="0"    x2="512"  y2="1024"/>
+    <line x1="768"  y1="0"    x2="768"  y2="1024"/>
+  </g>
+
+  <!-- Radial centre glow behind pulse line -->
+  <rect width="1024" height="1024" rx="224" ry="224" fill="url(#centerGlow)" clip-path="url(#roundedClip)"/>
+
+  <!--
+    EKG / heartbeat pulse line
+    Baseline sits at y=512 (vertical centre)
+    Path breakdown (left to right):
+      - Flat baseline from left edge
+      - Small pre-notch dip (P-wave)
+      - Sharp upward spike (QRS complex) — the dramatic centre peak
+      - Deep trough then return to baseline
+      - Small bump (T-wave)
+      - Flat back to right edge
+  -->
+
+  <!-- Glow layer (wide, soft) -->
+  <path
+    d="M 60,512
+       L 280,512
+       L 310,490
+       L 340,512
+       L 380,512
+       L 420,310
+       L 452,680
+       L 484,512
+       L 520,512
+       L 548,455
+       L 576,512
+       L 964,512"
+    fill="none"
+    stroke="#00FFE5"
+    stroke-width="28"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#glowStrong)"
+    opacity="0.55"
+    clip-path="url(#roundedClip)"
+  />
+
+  <!-- Mid glow layer -->
+  <path
+    d="M 60,512
+       L 280,512
+       L 310,490
+       L 340,512
+       L 380,512
+       L 420,310
+       L 452,680
+       L 484,512
+       L 520,512
+       L 548,455
+       L 576,512
+       L 964,512"
+    fill="none"
+    stroke="#00FFE5"
+    stroke-width="14"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#glowSoft)"
+    opacity="0.75"
+    clip-path="url(#roundedClip)"
+  />
+
+  <!-- Core line (sharp, bright white-cyan) -->
+  <path
+    d="M 60,512
+       L 280,512
+       L 310,490
+       L 340,512
+       L 380,512
+       L 420,310
+       L 452,680
+       L 484,512
+       L 520,512
+       L 548,455
+       L 576,512
+       L 964,512"
+    fill="none"
+    stroke="#E0FFFC"
+    stroke-width="7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    clip-path="url(#roundedClip)"
+  />
+
+  <!-- Neon dot at the spike peak — the "heartbeat moment" -->
+  <circle cx="420" cy="310" r="14" fill="#00FFE5" filter="url(#glowStrong)" opacity="0.9" clip-path="url(#roundedClip)"/>
+  <circle cx="420" cy="310" r="6"  fill="#ffffff" clip-path="url(#roundedClip)"/>
+
+  <!-- BLAZE wordmark at the bottom -->
+  <text
+    x="512"
+    y="880"
+    font-family="'Arial Black', 'Helvetica Neue', sans-serif"
+    font-weight="900"
+    font-size="112"
+    letter-spacing="18"
+    text-anchor="middle"
+    fill="#00FFE5"
+    filter="url(#glowText)"
+    clip-path="url(#roundedClip)"
+  >BLAZE</text>
+
+</svg>

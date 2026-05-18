@@ -1,0 +1,17 @@
+// !$*UTF8*$!
+// This is a stub Xcode project file.
+// To use this project:
+//
+// 1. Open Xcode (version 15 or later)
+// 2. File → New → Project → iOS → App
+// 3. Product Name: Blaze
+// 4. Bundle Identifier: com.yourname.blaze
+// 5. Interface: SwiftUI
+// 6. Language: Swift
+// 7. Minimum Deployment Target: iOS 17.0
+//
+// Then copy all Swift files from the Blaze/ folder into the newly created Xcode project,
+// preserving the folder structure (App, Models, Views, Services, Theme, Extensions).
+//
+// The full Xcode .pbxproj format requires Xcode to generate it —
+// this stub documents the project settings. See README.md for full setup steps.
